@@ -4,7 +4,7 @@ import { TileComponent } from '../tile/tile.component';
 
 @Component({
 	selector: 'lmf-board',
-	template: './board.component.html',
+	templateUrl: './board.component.html',
 	styleUrls: ['./board.component.css']
 })
 export class BoardComponent implements OnInit {
