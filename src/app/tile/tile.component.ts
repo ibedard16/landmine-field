@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 
 @Component({
 	selector: 'lmf-tile',
@@ -7,8 +7,20 @@ import { Component } from '@angular/core';
 })
 export class TileComponent {
 	private _neighbors: TileComponent[] = [];
+	id: string;
+	text = '';
 
-	addNeighbor(tile: TileComponent, ) {
+	@HostListener('click')
+	click() {
+		this.text = 'clicked';
+		this._neighbors.forEach(x => x.touch(this.id));
+	}
+
+	touch(id: string) {
+		this.text = 'touched by ' + id;
+	}
+
+	addNeighbor(tile: TileComponent) {
 		if (tile == null) {
 			throw new Error('Tile to add as neighbor cannot be null');
 		}

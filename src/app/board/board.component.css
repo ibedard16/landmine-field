@@ -1,0 +1,5 @@
+.board {
+	display: grid;
+	width: min-content;
+	height: min-content;
+}
