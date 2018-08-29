@@ -13,6 +13,7 @@ export class AppComponent implements AfterViewInit {
 	width = 7;
 	height = 7;
 	landmineCount = 7;
+	error = '';
 
 	constructor(
 		private cdf: ChangeDetectorRef
@@ -26,6 +27,19 @@ export class AppComponent implements AfterViewInit {
 	}
 
 	applyChanges() {
+		const numberOfTiles = this.width * this.height;
+		if (numberOfTiles > 5000) {
+			this.error = 'Requested board was too big to generate.';
+			return;
+		}
+
+		if (this.landmineCount > numberOfTiles / 2) {
+			this.error = 'There are too many landmines to place on this size grid';
+			return;
+		}
+
+		this.error = '';
+
 		this.board.buildBoard();
 		this.cdf.detectChanges();
 	}
