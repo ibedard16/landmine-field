@@ -1,4 +1,4 @@
-import { Component, ComponentFactoryResolver, Renderer2, ElementRef, OnInit, ViewContainerRef, ViewChild } from '@angular/core';
+import { Component, ComponentFactoryResolver, Renderer2, ElementRef, OnInit, ViewContainerRef, ViewChild, Input } from '@angular/core';
 
 import { TileComponent } from '../tile/tile.component';
 
@@ -7,12 +7,14 @@ import { TileComponent } from '../tile/tile.component';
 	templateUrl: './board.component.html',
 	styleUrls: ['./board.component.css']
 })
-export class BoardComponent implements OnInit {
+export class BoardComponent {
 	@ViewChild('board') boardEl: ElementRef;
-	board: TileComponent[][];
 
-	boardWidth = 5;
-	boardHeight = 5;
+	@Input() width: number;
+	@Input() height: number;
+	@Input() landmineCount: number;
+
+	board: TileComponent[][];
 
 	constructor(
 		private renderer: Renderer2,
@@ -21,51 +23,30 @@ export class BoardComponent implements OnInit {
 	) {
 	}
 
-	ngOnInit() {
-		this.buildBoard();
-	}
-
-	private buildBoard() {
+	buildBoard() {
+		// this.viewContainerRef.clear();
 		this.board = [];
-		for (let row = 0; row < this.boardHeight; row++) {
+		for (let row = 0; row < this.height; row++) {
 			this.board.push([]);
 
-			for (let col = 0; col < this.boardWidth; col++) {
+			for (let col = 0; col < this.width; col++) {
 				const currentTile = this.buildTile(row, col);
 				this.board[row].push(currentTile);
-				currentTile.id = '' + row + ' ' + col;
 
-				if (col > 0) {
-					const leftTile = this.board[row][col - 1];
-					currentTile.addNeighbor(leftTile);
-					leftTile.addNeighbor(currentTile);
-				}
-
-				if (row > 0) {
-					const upTile = this.board[row - 1][col];
-					currentTile.addNeighbor(upTile);
-					upTile.addNeighbor(currentTile);
-
-					if (col > 0) {
-						const upLeftTile = this.board[row - 1][col - 1];
-						currentTile.addNeighbor(upLeftTile);
-						upLeftTile.addNeighbor(currentTile);
-					}
-
-					if (col < this.boardWidth - 1) {
-						const upRightTile = this.board[row - 1][col + 1];
-						currentTile.addNeighbor(upRightTile);
-						upRightTile.addNeighbor(currentTile);
-					}
-				}
+				this.registerTileNeighbors(currentTile, row, col);
 			}
 		}
 	}
 
-	private buildRow() {
-		const row = this.renderer.createElement('div');
-		this.renderer.appendChild(this.boardEl.nativeElement, row);
-		return row;
+	placeLandmines() {
+		for (let i = 0; i < this.landmineCount; ++i) {
+			let tile = this.getRandomTile();
+			while (tile.hasLandmine) {
+				tile = this.getRandomTile();
+			}
+
+			tile.hasLandmine = true;
+		}
 	}
 
 	private buildTile(row: number, col: number) {
@@ -75,5 +56,38 @@ export class BoardComponent implements OnInit {
 		this.renderer.setStyle(tile.location.nativeElement, 'grid-row', row + 1);
 		this.renderer.setStyle(tile.location.nativeElement, 'grid-column', col + 1);
 		return tile.instance;
+	}
+
+	private registerTileNeighbors(tile: TileComponent, row: number, col: number) {
+		if (col > 0) {
+			const leftTile = this.board[row][col - 1];
+			tile.addNeighbor(leftTile);
+			leftTile.addNeighbor(tile);
+		}
+
+		if (row > 0) {
+			const upTile = this.board[row - 1][col];
+			tile.addNeighbor(upTile);
+			upTile.addNeighbor(tile);
+
+			if (col > 0) {
+				const upLeftTile = this.board[row - 1][col - 1];
+				tile.addNeighbor(upLeftTile);
+				upLeftTile.addNeighbor(tile);
+			}
+
+			if (col < this.width - 1) {
+				const upRightTile = this.board[row - 1][col + 1];
+				tile.addNeighbor(upRightTile);
+				upRightTile.addNeighbor(tile);
+			}
+		}
+	}
+
+	private getRandomTile() {
+		const randomRow = Math.floor((Math.random() * this.height));
+		const randomCol = Math.floor((Math.random() * this.width));
+
+		return this.board[randomRow][randomCol];
 	}
 }

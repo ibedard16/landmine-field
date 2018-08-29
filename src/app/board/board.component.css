@@ -2,4 +2,5 @@
 	display: grid;
 	width: min-content;
 	height: min-content;
+	border: 2px solid black;
 }

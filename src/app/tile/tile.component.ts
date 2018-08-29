@@ -1,23 +1,32 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnDestroy } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Component({
 	selector: 'lmf-tile',
 	templateUrl: './tile.component.html',
 	styleUrls: ['./tile.component.css']
 })
-export class TileComponent {
+export class TileComponent implements OnDestroy {
 	private _neighbors: TileComponent[] = [];
-	id: string;
+	hasLandmine = false;
+	isRevealed = false;
 	text = '';
+
+	ngOnDestroy() {
+		this._neighbors = null;
+	}
 
 	@HostListener('click')
 	click() {
-		this.text = 'clicked';
-		this._neighbors.forEach(x => x.touch(this.id));
+		this.revealTile().subscribe();
 	}
 
-	touch(id: string) {
-		this.text = 'touched by ' + id;
+	touch() {
+		if (this.hasLandmine) {
+			throw new Error('Tile with landmine should never be touched');
+		}
+
+		return this.revealTile();
 	}
 
 	addNeighbor(tile: TileComponent) {
@@ -34,5 +43,32 @@ export class TileComponent {
 		}
 
 		this._neighbors.push(tile);
+	}
+
+	private revealTile() {
+		return new Observable(() => {
+			this.isRevealed = true;
+			if (this.hasLandmine) {
+				this.text = '☼';
+				return;
+			}
+
+			const neighborsWithLandmines
+					= this._neighbors.filter(x => x.hasLandmine).length;
+
+			if (neighborsWithLandmines > 0) {
+				this.text = neighborsWithLandmines.toString();
+				return;
+			}
+
+			this.text = '';
+			this.touchNeighbors();
+		});
+	}
+
+	private touchNeighbors() {
+		this._neighbors
+			.filter(x => !x.isRevealed)
+			.forEach(x => x.touch().subscribe());
 	}
 }
