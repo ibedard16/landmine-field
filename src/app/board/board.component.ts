@@ -24,7 +24,7 @@ export class BoardComponent {
 	}
 
 	buildBoard() {
-		// this.viewContainerRef.clear();
+		this.viewContainerRef.clear();
 		this.board = [];
 		for (let row = 0; row < this.height; row++) {
 			this.board.push([]);
