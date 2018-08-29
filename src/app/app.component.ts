@@ -22,13 +22,11 @@ export class AppComponent implements AfterViewInit {
 
 	ngAfterViewInit() {
 		this.board.buildBoard();
-		this.board.placeLandmines();
 		this.cdf.detectChanges();
 	}
 
 	applyChanges() {
 		this.board.buildBoard();
-		this.board.placeLandmines();
 		this.cdf.detectChanges();
 	}
 }

@@ -12,12 +12,19 @@ export class TileComponent implements OnDestroy {
 	isRevealed = false;
 	text = '';
 
+	onClick: () => void;
+
 	ngOnDestroy() {
 		this._neighbors = null;
 	}
 
+	getNeighbors() {
+		return this._neighbors;
+	}
+
 	@HostListener('click')
 	click() {
+		this.onClick();
 		this.revealTile().subscribe();
 	}
 

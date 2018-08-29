@@ -16,6 +16,8 @@ export class BoardComponent {
 
 	board: TileComponent[][];
 
+	private landminesPlaced = false;
+
 	constructor(
 		private renderer: Renderer2,
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -36,13 +38,23 @@ export class BoardComponent {
 				this.registerTileNeighbors(currentTile, row, col);
 			}
 		}
+		this.landminesPlaced = false;
 	}
 
-	placeLandmines() {
+	placeLandmines(firstTileClicked: TileComponent) {
+		if (this.landminesPlaced) {
+			return;
+		}
+		this.landminesPlaced = true;
+
 		for (let i = 0; i < this.landmineCount; ++i) {
 			let tile = this.getRandomTile();
-			while (tile.hasLandmine) {
-				tile = this.getRandomTile();
+			while (
+				tile.hasLandmine ||
+				tile === firstTileClicked ||
+				firstTileClicked.getNeighbors().find(x => x === tile) != null
+				) {
+					tile = this.getRandomTile();
 			}
 
 			tile.hasLandmine = true;
@@ -55,6 +67,7 @@ export class BoardComponent {
 		this.renderer.appendChild(this.boardEl.nativeElement, tile.location.nativeElement);
 		this.renderer.setStyle(tile.location.nativeElement, 'grid-row', row + 1);
 		this.renderer.setStyle(tile.location.nativeElement, 'grid-column', col + 1);
+		tile.instance.onClick = () => this.placeLandmines(tile.instance);
 		return tile.instance;
 	}
 
