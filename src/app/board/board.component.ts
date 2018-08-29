@@ -47,17 +47,22 @@ export class BoardComponent {
 		}
 		this.landminesPlaced = true;
 
+		let flatBoard = [];
+		this.board.forEach(row => {
+			flatBoard = flatBoard.concat(row);
+		});
+
+		flatBoard.splice(flatBoard.indexOf(firstTileClicked), 1);
+		firstTileClicked.getNeighbors().forEach(neighbor => {
+			flatBoard.splice(flatBoard.indexOf(neighbor), 1);
+		});
+
 		for (let i = 0; i < this.landmineCount; ++i) {
-			let tile = this.getRandomTile();
-			while (
-				tile.hasLandmine ||
-				tile === firstTileClicked ||
-				firstTileClicked.getNeighbors().find(x => x === tile) != null
-				) {
-					tile = this.getRandomTile();
-			}
+			const tile = this.getRandomTile(flatBoard);
 
 			tile.hasLandmine = true;
+
+			flatBoard.splice(flatBoard.indexOf(tile), 1);
 		}
 	}
 
@@ -97,10 +102,8 @@ export class BoardComponent {
 		}
 	}
 
-	private getRandomTile() {
-		const randomRow = Math.floor((Math.random() * this.height));
-		const randomCol = Math.floor((Math.random() * this.width));
-
-		return this.board[randomRow][randomCol];
+	private getRandomTile(flatBoard: TileComponent[]) {
+		const randomTile = Math.floor(Math.random() * flatBoard.length);
+		return flatBoard[randomTile];
 	}
 }
