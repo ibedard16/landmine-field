@@ -10,9 +10,9 @@ import { BoardComponent } from './board/board.component';
 export class AppComponent implements AfterViewInit {
 	@ViewChild(BoardComponent) board: BoardComponent;
 
-	width = 7;
-	height = 7;
-	landmineCount = 7;
+	width = 17;
+	height = 17;
+	landmineCount = 48;
 	error = '';
 
 	constructor(
