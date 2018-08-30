@@ -10,12 +10,11 @@ import { TileComponent } from '../tile/tile.component';
 export class BoardComponent {
 	@ViewChild('board') boardEl: ElementRef;
 
-	@Input() width: number;
-	@Input() height: number;
-	@Input() landmineCount: number;
+	private board: TileComponent[][];
 
-	board: TileComponent[][];
-
+	private width: number;
+	private height: number;
+	private landmineCount: number;
 	private landminesPlaced = false;
 
 	constructor(
@@ -25,7 +24,21 @@ export class BoardComponent {
 	) {
 	}
 
-	buildBoard() {
+	applySettings(width: number, height: number, landmineCount: number) {
+		this.width = width;
+		this.height = height;
+		this.landmineCount = landmineCount;
+
+		this.buildBoard();
+	}
+
+	reset() {
+		const flatBoard = this.getFlatboard();
+		flatBoard.forEach(x => x.reset());
+		this.landminesPlaced = false;
+	}
+
+	private buildBoard() {
 		this.viewContainerRef.clear();
 		this.board = [];
 		for (let row = 0; row < this.height; row++) {
@@ -41,7 +54,7 @@ export class BoardComponent {
 		this.landminesPlaced = false;
 	}
 
-	placeLandmines(firstTileClicked: TileComponent) {
+	private placeLandmines(firstTileClicked: TileComponent) {
 		if (this.landminesPlaced) {
 			return;
 		}
@@ -61,12 +74,6 @@ export class BoardComponent {
 
 			flatBoard.splice(flatBoard.indexOf(tile), 1);
 		}
-	}
-
-	reset() {
-		const flatBoard = this.getFlatboard();
-		flatBoard.forEach(x => x.reset());
-		this.landminesPlaced = false;
 	}
 
 	private buildTile(row: number, col: number) {

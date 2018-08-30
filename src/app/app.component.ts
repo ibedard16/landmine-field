@@ -22,7 +22,7 @@ export class AppComponent implements AfterViewInit {
 	}
 
 	ngAfterViewInit() {
-		this.board.buildBoard();
+		this.board.applySettings(this.width, this.height, this.landmineCount);
 		this.cdf.detectChanges();
 	}
 
@@ -40,7 +40,7 @@ export class AppComponent implements AfterViewInit {
 
 		this.error = '';
 
-		this.board.buildBoard();
+		this.board.applySettings(this.width, this.height, this.landmineCount);
 		this.cdf.detectChanges();
 	}
 
