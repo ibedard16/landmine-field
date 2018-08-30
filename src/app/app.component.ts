@@ -43,4 +43,8 @@ export class AppComponent implements AfterViewInit {
 		this.board.buildBoard();
 		this.cdf.detectChanges();
 	}
+
+	reset() {
+		this.board.reset();
+	}
 }

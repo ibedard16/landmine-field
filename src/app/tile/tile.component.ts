@@ -18,6 +18,12 @@ export class TileComponent implements OnDestroy {
 		this._neighbors = null;
 	}
 
+	reset() {
+		this.isRevealed = false;
+		this.hasLandmine = false;
+		this.text = '';
+	}
+
 	getNeighbors() {
 		return this._neighbors;
 	}

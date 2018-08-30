@@ -47,10 +47,7 @@ export class BoardComponent {
 		}
 		this.landminesPlaced = true;
 
-		let flatBoard = [];
-		this.board.forEach(row => {
-			flatBoard = flatBoard.concat(row);
-		});
+		const flatBoard = this.getFlatboard();
 
 		flatBoard.splice(flatBoard.indexOf(firstTileClicked), 1);
 		firstTileClicked.getNeighbors().forEach(neighbor => {
@@ -64,6 +61,12 @@ export class BoardComponent {
 
 			flatBoard.splice(flatBoard.indexOf(tile), 1);
 		}
+	}
+
+	reset() {
+		const flatBoard = this.getFlatboard();
+		flatBoard.forEach(x => x.reset());
+		this.landminesPlaced = false;
 	}
 
 	private buildTile(row: number, col: number) {
@@ -100,6 +103,14 @@ export class BoardComponent {
 				upRightTile.addNeighbor(tile);
 			}
 		}
+	}
+
+	private getFlatboard() {
+		let flatBoard = [];
+		this.board.forEach(row => {
+			flatBoard = flatBoard.concat(row);
+		});
+		return flatBoard;
 	}
 
 	private getRandomTile(flatBoard: TileComponent[]) {

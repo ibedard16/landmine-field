@@ -1,7 +1,20 @@
-<lmf-board [width]="width" [height]="height" [landmineCount]="landmineCount"></lmf-board>
+<div>
+	<lmf-board [width]="width" [height]="height" [landmineCount]="landmineCount"></lmf-board>
+</div>
 
-Width: <input type="number" min="0" [(ngModel)]="width"/>
-Height: <input type="number" min="0" [(ngModel)]="height"/>
-# of Landmines: <input type="number" min="0" [(ngModel)]="landmineCount"/>
-<button (click)="applyChanges()">Apply</button>
-{{error}}
+<br />
+
+<div>
+	<div><button (click)="reset()">Reset</button></div>
+</div>
+
+<br />
+<hr />
+
+<div>
+	<div>Width: <input type="number" min="0" [(ngModel)]="width"/></div>
+	<div>Height: <input type="number" min="0" [(ngModel)]="height"/></div>
+	<div># of Landmines: <input type="number" min="0" [(ngModel)]="landmineCount"/></div>
+	<div><button (click)="applyChanges()">Apply</button></div>
+	<div>{{error}}</div>
+</div>
