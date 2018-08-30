@@ -10,6 +10,7 @@ export class TileComponent implements OnDestroy {
 	private _neighbors: TileComponent[] = [];
 	hasLandmine = false;
 	isRevealed = false;
+	hasFlag = false;
 	text = '';
 
 	onClick: () => void;
@@ -21,6 +22,7 @@ export class TileComponent implements OnDestroy {
 	reset() {
 		this.isRevealed = false;
 		this.hasLandmine = false;
+		this.hasFlag = false;
 		this.text = '';
 	}
 
@@ -30,11 +32,32 @@ export class TileComponent implements OnDestroy {
 
 	@HostListener('click')
 	click() {
+		if (this.hasFlag) {
+			return;
+		}
+
 		this.onClick();
 		this.revealTile().subscribe();
 	}
 
+	@HostListener('contextmenu', ['$event'])
+	flag(event) {
+		event.preventDefault();
+
+		if (this.hasFlag) {
+			this.hasFlag = false;
+			this.text = '';
+		} else {
+			this.hasFlag = true;
+			this.text = '⚑';
+		}
+	}
+
 	touch() {
+		if (this.hasFlag) {
+			return;
+		}
+
 		if (this.hasLandmine) {
 			throw new Error('Tile with landmine should never be touched');
 		}
@@ -81,7 +104,7 @@ export class TileComponent implements OnDestroy {
 
 	private touchNeighbors() {
 		this._neighbors
-			.filter(x => !x.isRevealed)
+			.filter(x => !x.isRevealed && !x.hasFlag)
 			.forEach(x => x.touch().subscribe());
 	}
 }
