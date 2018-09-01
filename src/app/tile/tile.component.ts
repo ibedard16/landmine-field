@@ -18,7 +18,7 @@ export class TileComponent implements OnDestroy {
 
 	constructor() {
 		this.tilesToReveal
-			.pipe(delay(50))
+			.pipe(delay(1000 / 60))
 			.subscribe(tiles => {
 				tiles.forEach(tile => {
 					if (tile.isRevealed || tile.hasFlag) {
