@@ -1,5 +1,6 @@
 import { Component, HostListener, OnDestroy } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Subject } from 'rxjs';
+import { delay } from 'rxjs/operators';
 
 @Component({
 	selector: 'lmf-tile',
@@ -12,6 +13,26 @@ export class TileComponent implements OnDestroy {
 	isRevealed = false;
 	hasFlag = false;
 	text = '';
+
+	tilesToReveal = new Subject<TileComponent[]>();
+
+	constructor() {
+		this.tilesToReveal
+			.pipe(delay(50))
+			.subscribe(tiles => {
+				tiles.forEach(tile => {
+					if (tile.isRevealed || tile.hasFlag) {
+						return;
+					}
+
+					tile.revealTile();
+					if (tile.text === '') {
+						const nextBatchOfTiles = tile.getNeighbors().filter(x => !x.isRevealed && !x.hasFlag);
+						this.tilesToReveal.next(nextBatchOfTiles);
+					}
+				});
+			});
+	}
 
 	onClick: () => void;
 
@@ -37,7 +58,11 @@ export class TileComponent implements OnDestroy {
 		}
 
 		this.onClick();
-		this.revealTile().subscribe();
+		this.revealTile();
+
+		if (this.text === '') {
+			this.tilesToReveal.next(this._neighbors);
+		}
 	}
 
 	@HostListener('contextmenu', ['$event'])
@@ -51,18 +76,6 @@ export class TileComponent implements OnDestroy {
 			this.hasFlag = true;
 			this.text = '⚑';
 		}
-	}
-
-	touch() {
-		if (this.hasFlag) {
-			return;
-		}
-
-		if (this.hasLandmine) {
-			throw new Error('Tile with landmine should never be touched');
-		}
-
-		return this.revealTile();
 	}
 
 	addNeighbor(tile: TileComponent) {
@@ -81,30 +94,21 @@ export class TileComponent implements OnDestroy {
 		this._neighbors.push(tile);
 	}
 
-	private revealTile() {
-		return new Observable(() => {
-			this.isRevealed = true;
-			if (this.hasLandmine) {
-				this.text = '☼';
-				return;
-			}
+	revealTile() {
+		this.isRevealed = true;
+		if (this.hasLandmine) {
+			this.text = '☼';
+			return;
+		}
 
-			const neighborsWithLandmines
-					= this._neighbors.filter(x => x.hasLandmine).length;
+		const neighborsWithLandmines
+				= this._neighbors.filter(x => x.hasLandmine).length;
 
-			if (neighborsWithLandmines > 0) {
-				this.text = neighborsWithLandmines.toString();
-				return;
-			}
+		if (neighborsWithLandmines > 0) {
+			this.text = neighborsWithLandmines.toString();
+			return;
+		}
 
-			this.text = '';
-			this.touchNeighbors();
-		});
-	}
-
-	private touchNeighbors() {
-		this._neighbors
-			.filter(x => !x.isRevealed && !x.hasFlag)
-			.forEach(x => x.touch().subscribe());
+		this.text = '';
 	}
 }
