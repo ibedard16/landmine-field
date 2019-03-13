@@ -1,6 +1,6 @@
 # LandmineField
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.1.3.
+A very simple Minesweeper clone built with Angular. Really just an excuse to work with Anular's `Renderer2`.
 
 ## Development server
 
